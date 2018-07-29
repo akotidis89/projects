@@ -8,7 +8,6 @@
 
 use warnings;
 use strict;
-use feature qw(switch);
 
 #
 #	Define some variables
@@ -57,6 +56,7 @@ if ($choice eq '1') {
 #	Define the subroutine for creating a record
 #
 sub create {
+	&clear;
 	print "\n\nYou are about to create a new record\n";
 	print "Please complete the appropriate fields\n\n";
 
@@ -85,27 +85,34 @@ sub create {
 	
 }
 
+#
+#	Simple subroutine to clear screen
+#
+sub clear {
+	print `clear`;
+}
 
 #
 #	Define subroutine for formatting output of records
 #
 sub view {
 	
-format RECORDS_TOP =
-First Name   Surname    Address      City       State          Zip
-+----------------------------------------------------------------------+
+&clear;
+$= = 10;
+my $i = 1;
+
+format STDOUT_TOP =
+Page @<
+     $%
+     
+ No   First Name   Surname      Address        City         State        Zip
++------------------------------------------------------------------------------+
 .
 	
-format RECORDS =
-@<<<<<<<<<<< @<<<<<<<<  @<<<<<<<<<<  @<<<<<<<<  @<<<<<<<<<<<   @<<<<<<<
-$firstname,  $surname,  $address,    $city,     $state,        $zip
+format STDOUT =
+ @<<  @<<<<<<<<<   @<<<<<<<<<<< @<<<<<<<<<<<<< @<<<<<<<<<<< @<<<<<<<<<<< @<<<<<
+$i++,$firstname, $surname,    $address,       $city,       $state,        $zip
 .
-	 
-#format RECORDS_BOTTOM =
-#+----------------------------------------------------------------------+
-#.
-
-open RECORDS, "| less" or die "Can't open less command: $!";
 
 open NAMES, $file or die "Can't open $file: $!";
 my @lines = <NAMES>;
@@ -114,8 +121,11 @@ close NAMES;
 foreach (@lines) {
 	chomp;
 	($firstname, $surname, $address, $city, $state, $zip) = split /:/;
-	write RECORDS;
+	write;
 } 
+
+print "\n\nPress <ENTER> to continue: ";
+<STDIN>;
 
 return;
 
@@ -126,6 +136,7 @@ return;
 #	Search the data for a record
 #
 sub search {
+	&clear;
 	print "\nPlease enter the search pattern: ";
 	chomp(my $pattern = <STDIN>);
 	my @match;
@@ -150,8 +161,9 @@ sub search {
 #	Subroutine to delete a record
 #
 sub delete {
-	print "\nNot implemented yet\n";
-	print "Press any key to continue: ";
+	&clear;
+	print "\nNot implemented yet\n\n";
+	print "Press <ENTER> to continue: ";
 	<STDIN>;
 	return 0;
 }
@@ -161,7 +173,8 @@ sub delete {
 #	What happens when we enter sth invalid?
 #
 sub retry {
-	print "\n\nYour input is invalid. Press any key to continue ";
+	&clear;
+	print "\n\nYour input is invalid. Press <ENTER> to continue ";
 	<STDIN>;
 	return;
 }
@@ -171,6 +184,7 @@ sub retry {
 #	Subroutine to exit the program
 #
 sub quit {
-	print "The program is exiting..\n";
+	print "\n\nThe program is exiting..\n";
+	sleep 1;
 	exit 0;
 }
