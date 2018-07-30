@@ -14,6 +14,7 @@ use strict;
 #
 my ($firstname, $surname, $address, $city, $state, $zip);
 my $file = "names.dat";
+my $i;
 
 
 #
@@ -79,7 +80,7 @@ sub create {
 	print "\n\nA new record has been created.\n";
 	print "Thank you for your input\n\n\n";
 	
-	print "Press any key to continue: ";
+	print "Press any key to continue ";
 	<STDIN>;
 	return;
 	
@@ -98,21 +99,7 @@ sub clear {
 sub view {
 	
 &clear;
-$= = 10;
-my $i = 1;
-
-format STDOUT_TOP =
-Page @<
-     $%
-     
- No   First Name   Surname      Address        City         State        Zip
-+------------------------------------------------------------------------------+
-.
-	
-format STDOUT =
- @<<  @<<<<<<<<<   @<<<<<<<<<<< @<<<<<<<<<<<<< @<<<<<<<<<<< @<<<<<<<<<<< @<<<<<
-$i++,$firstname, $surname,    $address,       $city,       $state,        $zip
-.
+&output;
 
 open NAMES, $file or die "Can't open $file: $!";
 my @lines = <NAMES>;
@@ -124,7 +111,7 @@ foreach (@lines) {
 	write;
 } 
 
-print "\n\nPress <ENTER> to continue: ";
+print "\n\nPress <ENTER> to continue ";
 <STDIN>;
 
 return;
@@ -137,21 +124,26 @@ return;
 #
 sub search {
 	&clear;
+	&output;
+	
 	print "\nPlease enter the search pattern: ";
 	chomp(my $pattern = <STDIN>);
-	my @match;
+	print "\n\n\n";
 	
 	open RECORDS, $file or die "The file $file can't be opened: $!";
 	my @lines = <RECORDS>;
 	close RECORDS;
 	
 	foreach (@lines) {
-		push @match if /$pattern/;
+		if (/$pattern/i) {
+			chomp;
+			($firstname, $surname, $address, $city, $state, $zip) = split /:/;
+			write;
+		}
 	}
 	
-	foreach (@match) {
-		print;
-	}
+	print "\n\n\nPress <ENTER> to continue ";
+	<STDIN>;
 	
 	return;
 }
@@ -163,7 +155,7 @@ sub search {
 sub delete {
 	&clear;
 	print "\nNot implemented yet\n\n";
-	print "Press <ENTER> to continue: ";
+	print "Press <ENTER> to continue ";
 	<STDIN>;
 	return 0;
 }
@@ -174,7 +166,7 @@ sub delete {
 #
 sub retry {
 	&clear;
-	print "\n\nYour input is invalid. Press <ENTER> to continue ";
+	print "\n\nYour input is invalid.\n\n\nPress <ENTER> to continue ";
 	<STDIN>;
 	return;
 }
@@ -187,4 +179,28 @@ sub quit {
 	print "\n\nThe program is exiting..\n";
 	sleep 1;
 	exit 0;
+}
+
+
+#
+#	Subroutine to define the formatting output of records
+#
+sub output {
+	
+	$= = 10;
+    $i = 1;
+
+format STDOUT_TOP =
+Page @<
+     $%
+     
+ No   First Name   Surname      Address        City         State        Zip
++------------------------------------------------------------------------------+
+.
+	
+format STDOUT =
+ @<<  @<<<<<<<<<   @<<<<<<<<<<< @<<<<<<<<<<<<< @<<<<<<<<<<< @<<<<<<<<<<< @<<<<<
+ $i++,$firstname,  $surname,    $address,      $city,       $state,      $zip
+.
+	
 }
